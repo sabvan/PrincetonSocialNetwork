@@ -22,9 +22,10 @@ connectionTypes = ["Zee Group/Orientation", "Class", "Academic/Career-focused Cl
 conTypesCount = np.full(10, 0)
 
 # type of search
-searchType = input("Type 1 to search path, type 2 to graph, type 3 to draw the connections of one person: ")
+searchType = input("Type 1 to search path, type 2 to graph, type 3 to draw the connections of one person, type 4 to see connection count: ")
 
-# search shortest path between two people
+###
+# 1: search shortest path between two people
 if searchType == "1":
   source = input("\nEnter source name: ")
   destination = input("\nEnter destination name: ")
@@ -57,30 +58,13 @@ if searchType == "1":
   print(path[len(path) - 1])
 
 
-  ## draw graph
-  # fig = plt.figure(figsize=(12,12))
-  edge_nodes = set(G)
-  # Ensures the nodes around the circle are evenly distributed
-  pos = nx.circular_layout(G.subgraph(edge_nodes))
-
-  for i in G.nodes:
-    pos[i] = np.array([random.randrange(200), random.randrange(200)])
-
-  nx.draw(G, pos, with_labels=True, node_size = 7, font_size=6, width = 1, edge_color = (0.1, 0.1, 0.1, 0.1))
-
-  plt.savefig("Graph.png", format="PNG")
-  plt.show()
-
-
-
-
 ###
-# draw graph os a specific connection type
-elif searchType == "1":
+# 2: draw graph as a specific connection type
+elif searchType == "2":
   requestConnection = input("\nType of the number corresponding to the connection type you want to see \n1: All\n2: Zee Group/Orientation\n3: Class\n4: Academic/Career-focused Club\n5: Athletic Club/Team\n6: Other Type of Club\n7: Mutual Friend\n8: Party/Social Event\n9: Professional Event/Program/Internship\n10: High School\n11: Other\n")
-  requestConnection = int(requestConnection) # degrees = input("\nNumber of Degrees you want to display: ")
+  requestConnection = int(requestConnection) 
   print(requestConnection)
-  ## populates the weighted and unweighted graph
+  # populates the weighted and unweighted graph
   i = 1
   for i in range(1, len(data)):
     sourceName = data[i][1]
@@ -89,22 +73,21 @@ elif searchType == "1":
         toName = data[i][j]
         toConnection = data[i][j+1]
       
-        # specific type
+        # Selectively chooses type of connection
         if requestConnection != 1:
           if len(toConnection) != 0 and connectionTypes.index(toConnection) == requestConnection - 2:
             G.add_edge(sourceName, toName, weight=connectionTypes.index(toConnection))
             G_noWeights.add_edge(sourceName, toName)
             conTypesCount[connectionTypes.index(toConnection)] += 1
-        else: # add all
+        else:
           if len(toConnection) != 0:
             G.add_edge(sourceName, toName, weight=connectionTypes.index(toConnection))
             G_noWeights.add_edge(sourceName, toName)
             conTypesCount[connectionTypes.index(toConnection)] += 1
           
 
-  ## draw graph
+  ## draws graph
   edge_nodes = set(G)
-  # Ensures the nodes around the circle are evenly distributed
   pos = nx.circular_layout(G.subgraph(edge_nodes))
 
   for i in G.nodes:
@@ -117,10 +100,9 @@ elif searchType == "1":
 
 
 
-
 ###
-# Shows connection of one person
-else:
+# 3:Shows connection of one person
+elif searchType == "3":
   source = input("\nEnter source name: ")
   for i in range(1, len(data)):
     sourceName = data[i][1]
@@ -136,7 +118,6 @@ else:
           conTypesCount[connectionTypes.index(toConnection)] += 1
 
   edge_nodes = set(G)
-  # Ensures the nodes around the circle are evenly distributed
   pos = nx.circular_layout(G.subgraph(edge_nodes))
 
   for i in G.nodes:
@@ -146,3 +127,25 @@ else:
 
   plt.savefig("Graph.png", format="PNG")
   plt.show()
+  
+  
+###
+# Print connection counts
+else:
+  for i in range(1, len(data)):
+    sourceName = data[i][1]
+    if data[i][2] == '2026':
+      for j in range(3, len(data[0]), 2):
+        toName = data[i][j]
+        toConnection = data[i][j+1]
+      
+        # if not empty toConnection
+        if len(toConnection) != 0:
+          G.add_edge(sourceName, toName, weight=connectionTypes.index(toConnection))
+          G_noWeights.add_edge(sourceName, toName)
+          conTypesCount[connectionTypes.index(toConnection)] += 1
+          
+          
+  print("\nNumber of connections of each type: ")
+  for i in range(10):
+    print(connectionTypes[i], ": ", conTypesCount[i])
